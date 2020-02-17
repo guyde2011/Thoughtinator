@@ -1,6 +1,6 @@
 import json
 
-from thoughtinator.parsers import parser
+from parsers import parser
 
 @parser.of('feelings')
 def parse_feelings(data: str) -> str:

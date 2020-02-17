@@ -1,12 +1,12 @@
 import json
+import numpy
+import matplotlib.pyplot as pyplot
 
 from pathlib import Path
-import numpy as np
-import matplotlib.pyplot as plt
 from typing import cast
 
 from thoughtinator.utils import env
-from thoughtinator.parsers import parser
+from parsers import parser
 
 DEFAULT_FOLDER = '{}/parsed'.format(env.os['SAVE_FOLDER'] or '/thoughtbase')
 
@@ -25,11 +25,11 @@ def parse_depth_image(data: str, folder: str = DEFAULT_FOLDER) -> str:
         'user_id': j_data['user_id'],
     })
     
-def _save_image(f_data: dict, path: Path):
+def _save_image(data: dict, path: Path):
     if not path.exists():
         path.mkdir(parents=True)
 
-    flat_img = np.load(f_data['data'])
-    img = flat_img.reshape(f_data['width'], f_data['height'])
-    plt.imshow(img)
-    plt.savefig(path / 'depth_image.jpg')
+    f_data = np.load(data['path'])
+    img = f_data.reshape(f_data['width'], f_data['height'])
+    pyplot.imshow(img)
+    pyplot.savefig(path / 'depth_image.jpg')

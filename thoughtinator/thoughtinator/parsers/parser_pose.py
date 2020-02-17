@@ -1,6 +1,6 @@
 import json
 
-from thoughtinator.parsers import parser
+from parsers import parser
 
 @parser.of('pose')
 def parse_pose(data: str) -> str:

@@ -5,7 +5,7 @@ from PIL import Image
 from typing import cast
 
 from thoughtinator.utils import env
-from thoughtinator.parsers import parser
+from parsers import parser
 
 DEFAULT_FOLDER = '{}/parsed'.format(env.os['SAVE_FOLDER'] or '/thoughtbase')
 
@@ -29,7 +29,7 @@ def _save_image(data: dict, path: Path):
     if not path.exists():
         path.mkdir(parents=True)
 
-    with open(data['data'], 'rb') as img_file:
+    with open(data['path'], 'rb') as img_file:
         f_data = img_file.read()
 
     img = Image.frombytes('RGB', data['width'], data['height'], f_data)

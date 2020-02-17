@@ -2,6 +2,10 @@ import functools
 import typing
 
 class ParsersManager:
+
+    def __init__(self):
+        self.parsers = {}
+        
     def of(self, *fields: str):
         if typing.TYPE_CHECKING:
             def parser_decorator(parser):

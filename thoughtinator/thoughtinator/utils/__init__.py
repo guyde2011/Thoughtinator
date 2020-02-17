@@ -1,2 +1,3 @@
-from .env_helper import EnvHelper
-env = EnvHelper()
+from thoughtinator.utils import env_helper 
+env = env_helper.EnvHelper()
+env.load_config()
