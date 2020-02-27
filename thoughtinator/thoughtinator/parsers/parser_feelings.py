@@ -1,6 +1,7 @@
 import json
 
-from parsers import parser
+from . import parser
+
 
 @parser.of('feelings')
 def parse_feelings(data: str) -> str:

@@ -3,7 +3,8 @@ import os
 import json
 import sys
 
-from typing import Optional, List, cast
+from typing import Optional, List, Dict
+from typing import cast
 
 from pathlib import Path
 
@@ -12,9 +13,10 @@ class EnvHelper:
     def __init__(self):
         self.os: OSEnv = OSEnv()
         self.root: Path = Path(__file__).parent.parent.parent
-        self.config: dict = {}
-        
-    def load_config(self) -> dict:
+        self.config: Dict = {}
+        self.props: Dict[str, str] = {}
+
+    def load_config(self):
         from thoughtinator.utils.logger import error
         config_path = self.root / 'config.json'
         if not config_path.exists():
@@ -26,13 +28,15 @@ class EnvHelper:
         try:
             self.config = json.loads(config_data)
         except BaseException as e:
-            error(str(e))
-            
+            error(f'Malformed config.json file \n\t> {str(e)}')
+            sys.exit()
+
     @property
     def options(self) -> List[str]:
         if 'options' not in self.config:
             return []
         return cast(List[str], self.config['options'])
+
 
 class OSEnv:
     def __contains__(self, field: str) -> bool:

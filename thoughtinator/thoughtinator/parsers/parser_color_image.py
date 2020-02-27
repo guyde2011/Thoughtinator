@@ -5,7 +5,7 @@ from PIL import Image
 from typing import cast
 
 from thoughtinator.utils import env
-from parsers import parser
+from . import parser
 
 DEFAULT_FOLDER = '{}/parsed'.format(env.os['SAVE_FOLDER'] or '/thoughtbase')
 
@@ -20,11 +20,12 @@ def parse_color_image(data: str, folder: str = DEFAULT_FOLDER) -> str:
     _save_image(cast(dict, j_data['color_image']), img_path)
 
     return json.dumps({
-        'data': {'path': str(path) / 'color_image.jpg'},
+        'data': {'path': str(path / 'color_image.jpg')},
         'datetime': j_data['datetime'],
         'user_id': j_data['user_id'],
     })
-    
+
+
 def _save_image(data: dict, path: Path):
     if not path.exists():
         path.mkdir(parents=True)

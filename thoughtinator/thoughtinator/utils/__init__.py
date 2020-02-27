@@ -1,3 +1,4 @@
-from thoughtinator.utils import env_helper 
-env = env_helper.EnvHelper()
+from .module_loader import ModuleLoader  # noqa: F401
+from .env_helper import EnvHelper
+env = EnvHelper()
 env.load_config()

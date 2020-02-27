@@ -1,46 +1,48 @@
 import click
-import furl
 import sys
 
 from pathlib import Path
+from furl import furl
 
-from thoughtinator.utils import logger, env
+from thoughtinator.utils import logger, env, ansi
+import thoughtinator.mqueue as mqueue
 from . import parser
-error = logger.error(forbid=['hide-click-errors'])
+
 
 @click.group()
 def cli():
     pass
 
-schemes = {}
 
 @cli.command('run-parser')
 @click.argument('field')
 @click.argument('url')
-def run_parser(field, url):
-    scheme = furl.furl(url).scheme
-    if scheme not in schemes:
-        error(f'Scheme `{scheme}` not supported', func=click.echo)
+def command_run_parser(field, url):
+    scheme = furl(url).scheme
+    if scheme not in mqueue:
+        logger.error(f'Scheme {ansi.bold(scheme)} not supported')
         return
-    schemes[scheme](field)
+    env.props['mqueue_url'] = url
+    mqueue[scheme].publish
 
 
 @cli.command('parse')
 @click.argument('field')
-@click.argument('file_name')
-def cli_command_parse(field, file_name):
-    if not Path(file_name).exists():
-        error(f'File `{file_name}` does not exist', func=click.echo)
+@click.argument('filename')
+def command_parse(field, filename):
+    if not Path(filename).exists():
+        logger.error(f'File {ansi.bold(filename)} does not exist')
         return
 
-    if field not in parser.parsers:
-        error(f'Parser `{field}` does not exist', func=click.echo)
+    if field not in parser:
+        logger.error(f'Parser {ansi.bold(field)} does not exist')
         return
 
-    with open(file_name, 'r') as f:
+    with open(filename, 'r') as f:
         data = f.read()
 
-    parser.parsers[field](data)
+    print(parser[field](data))
+
 
 if __name__ == '__main__':
     sys.exit(cli())
