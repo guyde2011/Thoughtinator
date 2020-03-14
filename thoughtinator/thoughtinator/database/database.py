@@ -28,8 +28,6 @@ class Database:
     @cached_property
     def snapshots(self):
         class SnapshotsProxy:
-            def __iadd__(_, user: User):
-                self._driver.put_user(user)
 
             @overload
             def __getitem__(_, snap_id: int) -> Optional[Snapshot]: ...  # noqa: F811, E501
@@ -45,3 +43,7 @@ class Database:
                         cast(User, index)['user_id'])
 
         return SnapshotsProxy()
+
+    @property
+    def savers(self):
+        return self._driver.savers

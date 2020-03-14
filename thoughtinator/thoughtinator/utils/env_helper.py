@@ -18,7 +18,12 @@ class EnvHelper:
 
     def load_config(self):
         from thoughtinator.utils.logger import error
-        config_path = self.root / 'config.json'
+        config_env = self.os['CONFIG_FILE']
+        if config_env is None:
+            config_path = self.root / 'config.json'
+        else:
+            config_path = Path(config_env)
+
         if not config_path.exists():
             error(f'Config file {config_path} does not exist')
             sys.exit()

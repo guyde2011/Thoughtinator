@@ -1,8 +1,6 @@
 import importlib
 import sys
 
-from pathlib import Path
-
 from . import logger, ansi
 
 
@@ -28,9 +26,10 @@ class ModuleLoader:
     def load_wrapper(self, member, name: str):
         return member, [name]
 
-    def load_modules(self, folder: Path):
+    def load_modules(self, path: str):
+        from . import env
+        folder = env.root / path.replace('.', '/')
         logger.info(f'Loading modules from {ansi.bold(folder)}')
-        sys.path.insert(0, str(folder.parent))
         for file in folder.iterdir():
             if not file.name.endswith('.py'):
                 continue
@@ -38,9 +37,9 @@ class ModuleLoader:
             if not self.file_filter(name):
                 continue
             logger.info('Loading module {}'.format(
-                ansi.bold(f"{folder.stem}.{file.stem}")))
-            mod = importlib.import_module(f'{folder.name}.{file.stem}',
-                                          folder.name)
+                ansi.bold(f"{path}.{file.stem}")))
+            mod = importlib.import_module(
+                f'{path}.{file.stem}', path)
             for member in mod.__dict__:
                 if not self.name_filter(member):
                     continue

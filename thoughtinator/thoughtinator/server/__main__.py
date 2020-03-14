@@ -14,8 +14,8 @@ def cli():
 @click.option('--port', '-p', required=True, type=int)
 @click.argument('mqueue_url', type=str)
 def command_run_server(host, port, mqueue_url):
-    endpoint = ServerEndpoint(host, port, mqueue_url)
-    endpoint.run()
+    endpoint = ServerEndpoint(mqueue_url)
+    endpoint.run(host, port)
 
 
 if __name__ == '__main__':

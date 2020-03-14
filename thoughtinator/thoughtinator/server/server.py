@@ -1,62 +1,83 @@
 import flask
-
+import bson
 
 from furl import furl
 from pathlib import Path
 from typing import Optional
-from json import dumps as json_dumps
+from threading import Thread, Lock
+import numpy as np
 
-from thoughtinator import mqueue
-from thoughtinator.utils import logger, env
+from thoughtinator.mqueue import drivers
+from thoughtinator.utils import logger, env, FlaskEndpoint
 
 
-class ServerEndpoint:
+class ServerEndpoint(FlaskEndpoint):
     def __init__(self,
-                 host: str,
-                 port: int,
                  mqueue_url: str,
                  *,
                  path: Optional[Path] = None):
-        self.mqueue_url = furl(mqueue_url)
-        self.app = flask.Flask('thoughtinator3000')
-        self.host = host
-        self.port = port
-        self.app.route('/snapshot', methods=['POST'])(self._load_snapshot)
+        super().__init__('thoughtinator/server')
+        self.mqueue_url: furl = furl(mqueue_url)
         self.path: Path = path or Path(env.os['SAVE_FOLDER'])
+        self._snap_id: int = 0
+        self._lock: Lock = Lock()
 
-    def _load_snapshot(self):
+    def snap_id(self):
+        with self._lock:
+            ret = self._snap_id
+            self._snap_id += 1
+        return ret
+
+    @route('/snapshot', methods=['POST'])
+    def load_snapshot(self):
         try:
-            json: dict = flask.request.get_json()
+            json: dict = bson.decode(flask.request.get_data())
         except BaseException as e:
             logger.warning(f'Malformed json from user\n\t  > {e}')
-            return {'success': False, 'error': 'Malformed JSON'}, 400
-        try:
-            path = self.path / str(json['user']['user_id']) / json['datetime']
-            self._save_snapshot(json, path=path)
-            json['color_image'].pop('data')
-            json['depth_image'].pop('data')
-            json['color_image']['path'] = str(path / 'color_image.jpg')
-            json['depth_image']['path'] = str(path / 'depth_image.jpg')
-        except BaseException as e:
-            logger.warning(f'Invalid json from user\n\t  > {e}')
-            return {'error': 'Invalid JSON'}, 418
-        self._publish_snapshot(json_dumps(json), json_dumps(json['user']))
-        return {}, 200
+            return {'error': 'Malformed JSON'}, 400
 
-    def run(self):
-        self.app.run(self.host, self.port)
+        snap_id = self.snap_id()
+        json['snap_id'] = snap_id
+        Thread(target=lambda: self._handle_snapshot(json)).start()
+        return {'id': snap_id}, 200
+
+    def _handle_snapshot(self, json: dict):
+        path = self.path / str(json['user_id']) / str(json['datetime'])
+        self._save_snapshot(json, path=path)
+        json['color_image'].pop('data')
+        json['depth_image'].pop('data')
+        json['color_image']['path'] = str(path / 'color_image.raw')
+        json['depth_image']['path'] = str(path / 'depth_image.npy')
+        self._publish_snapshot(bson.encode(json))
+
+    @route('/user', methods=['POST'])
+    def load_user(self):
+        try:
+            json: dict = bson.decode(flask.request.get_data())
+        except BaseException as e:
+            logger.warning(f'Malformed json from user\n\t  > {e}')
+            return {'error': 'Malformed JSON'}, 400
+        Thread(target=lambda: self._publish_user(bson.encode(json))).start() 
+        return '', 200
 
     def _save_snapshot(self, json: dict, *, path: Path):
         path.mkdir(parents=True, exist_ok=True)
-        (path / 'color_image.jpg').write_bytes(
-            json['color_image']['data'].encode('latin1'))
-        (path / 'depth_image.jpg').write_bytes(
-            json['depth_image']['data'].encode('latin1'))
+        (path / 'color_image.raw').write_bytes(
+            json['color_image']['data'])
 
-    def _publish_snapshot(self, data: str, user: str):
+        np.save(str(path / 'depth_image.npy'),
+                np.array(json['depth_image']['data']))
+
+    def _publish_snapshot(self, snap: str):
         host = self.mqueue_url.host
         port = self.mqueue_url.port
         scheme = self.mqueue_url.scheme
-        driver = mqueue[scheme](host, port)
-        driver.publish_work(user, route='data', exchange='thoughtinator.user')
-        driver.publish_data(data, exchange='thoughtinator.work')
+        driver = drivers[scheme](host, port)
+        driver.publish_work(snap, 'thoughtinator.raw')
+
+    def _publish_user(self, user: str):
+        host = self.mqueue_url.host
+        port = self.mqueue_url.port
+        scheme = self.mqueue_url.scheme
+        driver = drivers[scheme](host, port)
+        driver.publish_data(user, 'thoughtinator.out', 'user')

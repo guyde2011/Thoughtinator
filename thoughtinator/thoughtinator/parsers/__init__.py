@@ -1,7 +1,7 @@
-
+import functools
 import typing
 
-from thoughtinator.utils import logger, env, ansi
+from thoughtinator.utils import logger, ansi
 from thoughtinator.utils import ModuleLoader
 
 
@@ -27,6 +27,7 @@ class ParsersManager(ModuleLoader):
             f'Loaded parser {ansi.bold(parser.__name__)} '
             f'from {ansi.bold(parser.__module__)} '
             f'for {ansi.bold(", ".join(parser.__pfields__))}')
+
         return parser, parser.__pfields__
 
     def of(self, *fields: str):
@@ -43,4 +44,4 @@ class ParsersManager(ModuleLoader):
 parser = ParsersManager()
 
 if __name__ == 'thoughtinator.parsers':
-    parser.load_modules(env.root / 'thoughtinator' / 'parsers')
+    parser.load_modules('thoughtinator.parsers')

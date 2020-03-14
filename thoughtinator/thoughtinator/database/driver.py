@@ -1,5 +1,5 @@
-from typing import Protocol, List, TypedDict, Optional
-from datetime import datetime
+from typing import Protocol, List, TypedDict, Optional, Dict, Callable
+
 
 Rotation = TypedDict('Rotation',
                      {'x': float, 'y': float, 'z': float, 'w': float})
@@ -16,7 +16,7 @@ DepthImage = TypedDict('DepthImage', {'path': str})
 User = TypedDict('User', {
         'user_id': int,
         'username': str,
-        'birthday': datetime,
+        'birthday': int,
         'gender': int
     })
 
@@ -29,8 +29,8 @@ Feelings = TypedDict('Feelings', {
 
 Snapshot = TypedDict('Snapshot', {
         'user_id': int,
-        'snap_id': int,
-        'time': datetime,
+        'snapshot_id': int,
+        'datetime': int,
         'pose': Pose,
         'color_image': ColorImage,
         'depth_image': DepthImage,
@@ -39,6 +39,8 @@ Snapshot = TypedDict('Snapshot', {
 
 
 class DatabaseDriver(Protocol):
+    savers: Dict[str, Callable]
+
     def fetch_users(self) -> List[User]:
         pass
 
