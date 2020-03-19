@@ -13,8 +13,10 @@ class ProtobufDriver:
 
     @property
     def user(self):
-        ret = MessageToDict(self._user, preserving_proto_field_name=True)
+        ret = MessageToDict(self._user, preserving_proto_field_name=True,
+                            including_default_value_fields=True)
         ret['user_id'] = int(ret['user_id'])
+        ret['gender'] = {'MALE': 0, 'FEMALE': 1, 'OTHER': 2}[ret['gender']]
         return ret
 
     def read(self):
@@ -33,6 +35,7 @@ class ProtobufDriver:
                     snap.ParseFromString(b''.join(reads), )
                 except struct.error:
                     return
-                ret = MessageToDict(snap, preserving_proto_field_name=True)
+                ret = MessageToDict(snap, preserving_proto_field_name=True,
+                                    including_default_value_fields=True)
                 ret['color_image']['data'] = snap.color_image.data
                 yield ret

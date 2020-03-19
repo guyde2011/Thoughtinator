@@ -1,0 +1,1 @@
+PARSER_FIELDS = ['pose', 'feelings', 'depth_image', 'color_image']

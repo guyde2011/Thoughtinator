@@ -27,7 +27,6 @@ def _post_user(user: dict, host: str, port: int):
 
 
 def _post_snapshot(snap: dict, user: dict, host: str, port: int):
-    print(user)
     snap['user_id'] = user['user_id']
     resp = requests.post(f'http://{host}:{port}/snapshot',
                          bson.encode(snap))

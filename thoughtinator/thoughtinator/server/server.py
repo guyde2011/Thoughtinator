@@ -1,26 +1,25 @@
 import flask
 import bson
 
-from furl import furl
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Callable
 from threading import Thread, Lock
 import numpy as np
 
-from thoughtinator.mqueue import drivers
 from thoughtinator.utils import logger, env, FlaskEndpoint
 
 
 class ServerEndpoint(FlaskEndpoint):
     def __init__(self,
-                 mqueue_url: str,
+                 publish: Callable,
                  *,
                  path: Optional[Path] = None):
         super().__init__('thoughtinator/server')
-        self.mqueue_url: furl = furl(mqueue_url)
+        self.publish = publish
         self.path: Path = path or Path(env.os['SAVE_FOLDER'])
         self._snap_id: int = 0
         self._lock: Lock = Lock()
+        self.driver = publish
 
     def snap_id(self):
         with self._lock:
@@ -57,7 +56,7 @@ class ServerEndpoint(FlaskEndpoint):
         except BaseException as e:
             logger.warning(f'Malformed json from user\n\t  > {e}')
             return {'error': 'Malformed JSON'}, 400
-        Thread(target=lambda: self._publish_user(bson.encode(json))).start() 
+        Thread(target=lambda: self._publish_user(bson.encode(json))).start()
         return '', 200
 
     def _save_snapshot(self, json: dict, *, path: Path):
@@ -69,15 +68,7 @@ class ServerEndpoint(FlaskEndpoint):
                 np.array(json['depth_image']['data']))
 
     def _publish_snapshot(self, snap: str):
-        host = self.mqueue_url.host
-        port = self.mqueue_url.port
-        scheme = self.mqueue_url.scheme
-        driver = drivers[scheme](host, port)
-        driver.publish_work(snap, 'thoughtinator.raw')
+        self.driver(snap, 'thoughtinator.raw')
 
     def _publish_user(self, user: str):
-        host = self.mqueue_url.host
-        port = self.mqueue_url.port
-        scheme = self.mqueue_url.scheme
-        driver = drivers[scheme](host, port)
-        driver.publish_data(user, 'thoughtinator.out', 'user')
+        self.driver(user, 'thoughtinator.out', 'user')

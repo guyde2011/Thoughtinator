@@ -28,3 +28,6 @@ class FlaskEndpoint(metaclass=FlaskEndpointMeta):
 
     def run(self, host: str, port: int):
         self.app.run(host, port)
+
+    def test_client(self):
+        return self.app.test_client()

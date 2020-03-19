@@ -65,36 +65,27 @@ class SnapshotPage extends FetchComponent {
         alt="Depth Image" title="Depth Image"/>
         let pose = this.bound(['pose'], () => <PosePanel pose={this.fetched.pose}/>, () => <div></div>)
         let feelings = this.bound(['feelings'], () => <FeelingsPanel feelings={this.fetched.feelings}/>, () => <div></div>)
-        let prev = <div id='prev-snap' name='card-bg' onClick={this.onPrev} 
-        disabled={this.bound(['prev_snapshot'],
+        let prev = <div id='prev-snap' name='card-bg' onClick={this.onPrev} disabled={this.bound(['prev_snapshot'],
         () => this.fetched.prev_snapshot === -Infinity || this.fetched.prev_snapshot === NaN, () => true)}>{"<"}</div>
-        let next = <div id='next-snap' name='card-bg' onClick={this.onNext} 
-            disabled={this.bound(['next_snapshot'],
+        let next = <div id='next-snap' name='card-bg' onClick={this.onNext} disabled={this.bound(['next_snapshot'],
                     () => this.fetched.next_snapshot === Infinity || this.fetched.next_snapshot === NaN, () => true)}>{">"}</div>
         return (
             <div style={{color: 0xffffff}}>
                 id: {this.props.snap}
-            {next}
-            {prev}
-            
-            
-            <div className='column' id='images-div'>
-                <div>
-                {color_image}   
-                {pose}
+                {next}{prev}
+                <div className='column' id='images-div'>
+                    <div>
+                        {color_image}{pose}
+                    </div>
+                    <div id='a-block'>
+                        {depth_image}
+                        <div id='b-block'>
+                            {feelings}
+                            {main_panel}
+                        </div>
+                    </div>
                 </div>
-                <div id='a-block'>
-                {depth_image}
-                <div id='b-block'>
-                {feelings}
-                {main_panel}
-                </div>
-                
-                </div>
-            </div>
-            <div className='column'>
-                
-            </div>
+                <div className='column'/>
                 <div id='back-snapshot' name='card-bg' onClick={this.onBack}>Back</div>
             </div>
         )

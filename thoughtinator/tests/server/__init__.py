@@ -1,0 +1,36 @@
+POST_USER = {
+    'in':
+    {
+        'user_id': 1,
+        'username': 'Heinz Doofenshmirtz',
+        'birthday': 1000,
+        'gender': 0
+    },
+    'out':
+        (b'N\x00\x00\x00\x10user_id\x00\x01\x00\x00\x00\x02username\x00\x14\x00\x00\x00Heinz Doofenshmirtz\x00\x10birthday\x00\xe8\x03\x00\x00\x10gender\x00\x00\x00\x00\x00\x00', 'thoughtinator.out', 'user')
+}
+
+POST_SNAPSHOT = {
+    'in':
+    {
+        'user_id': 1,
+        'datetime': '100',
+        'pose': {
+            'translation': {'x': 0, 'y': 1, 'z': 2},
+            'rotation': {'x': 0, 'y': 1, 'z': 2, 'w': 3}
+        },
+        'color_image': {
+            'width': 0,
+            'height': 0,
+            'data': b''
+        },
+        'depth_image': {
+            'width': 0,
+            'height': 0,
+            'data': []
+        }
+    },
+    'out':
+    (b'T\x01\x00\x00\x10user_id\x00\x01\x00\x00\x00\x02datetime\x00\x04\x00\x00\x00100\x00\x03pose\x00W\x00\x00\x00\x03translation\x00\x1a\x00\x00\x00\x10x\x00\x00\x00\x00\x00\x10y\x00\x01\x00\x00\x00\x10z\x00\x02\x00\x00\x00\x00\x03rotation\x00!\x00\x00\x00\x10x\x00\x00\x00\x00\x00\x10y\x00\x01\x00\x00\x00\x10z\x00\x02\x00\x00\x00\x10w\x00\x03\x00\x00\x00\x00\x00\x03color_image\x00V\x00\x00\x00\x10width\x00\x00\x00\x00\x00\x10height\x00\x00\x00\x00\x00\x02path\x000\x00\x00\x00/tmp/pytest/thoughtinator/1/100/color_image.raw\x00\x00\x03depth_image\x00V\x00\x00\x00\x10width\x00\x00\x00\x00\x00\x10height\x00\x00\x00\x00\x00\x02path\x000\x00\x00\x00/tmp/pytest/thoughtinator/1/100/depth_image.npy\x00\x00\x10snap_id\x00\x00\x00\x00\x00\x00', 'thoughtinator.raw')
+
+}
