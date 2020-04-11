@@ -29,7 +29,7 @@ Feelings = TypedDict('Feelings', {
 
 Snapshot = TypedDict('Snapshot', {
         'user_id': int,
-        'snapshot_id': int,
+        'snap_id': int,
         'datetime': int,
         'pose': Pose,
         'color_image': ColorImage,
@@ -39,22 +39,59 @@ Snapshot = TypedDict('Snapshot', {
 
 
 class DatabaseDriver(Protocol):
+    """
+    This is a type specification for how a driver **should** look.
+    It is only optional, as using python protocols doesn't enforce any
+    type hierarchy, but rather allows the user to know what to expect
+    from each method
+    """
+
     savers: Dict[str, Callable]
 
     def fetch_users(self) -> List[User]:
-        pass
+        """ Returns all users in the database
+
+        :rtype: List[User]
+        """
+        ...
 
     def fetch_user(self, user_id: int) -> Optional[User]:
-        pass
+        """ Fetches a user with a given user id (or None if it doesn't exist)
+        :type user_id: int
+        :param user_id: the user id to fetch
+
+        :rtype: User or None
+        """
+        ...
 
     def fetch_snapshots(self, user_id: int) -> Optional[List[Snapshot]]:
-        pass
+        """ Fetches the snapshots of a given user (or None if they don't exist)
+        :type user_id: int
+        :param user_id: the user's id
+
+        :rtype: List[Snapshot] or None
+        """
+        ...
 
     def fetch_snapshot(self, snap_id: int) -> Optional[Snapshot]:
-        pass
+        """ Fetches a snapshot with a given id (or None if it doesn't exist)
+        :type snap_id: int
+        :param snap_id: the snapshots's id
+
+        :rtype: Snapshot or None
+        """
+        ...
 
     def put_user(self, user: User):
-        pass
+        """ Puts a user in the database
+        :type user: User
+        :param user: the user to put
+        """
+        ...
 
     def put_snapshot(self, snapshot: Snapshot):
-        pass
+        """ Puts a snapshot in the database
+        :type snapshot: Snapshot
+        :param snapshot: the snapshot to put
+        """
+        ...

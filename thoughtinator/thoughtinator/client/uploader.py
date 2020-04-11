@@ -9,6 +9,19 @@ def upload_sample(path: str,
                   host: str,
                   port: int = 8000,
                   file_format: str = 'protobuf'):
+    """Uploads a sample file with to a remote host
+    :type path: str
+    :param path: the path to the sample file
+
+    :type host: str
+    :param host: the host of the upload server
+
+    :type port: int
+    :param port: the port of the upload server
+
+    :type file_format: str
+    :param file_format: the format of the sample file
+    """
     file_reader = drivers[file_format](path)
     posted_user = False
     for snap in file_reader.read():

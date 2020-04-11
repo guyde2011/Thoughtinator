@@ -31,6 +31,24 @@ class ParsersManager(ModuleLoader):
         return parser, parser.__pfields__
 
     def of(self, *fields: str):
+        """
+        This is a decorator meant to mark a certain function as a parser.
+        It is used like this:
+        ```py
+        @parser.of('smell')
+        def smell_parser_function():
+            ...
+        ```
+        And it is equivalent to writing
+
+        ```py
+        def smell_parser_function():
+            ...
+        smell_parser_function.__pfields__ = ['smell']
+        ```
+        :type fields: str
+        :param fields: the parser's fields
+        """
         if typing.TYPE_CHECKING:
             def parser_decorator(parser):
                 return parser

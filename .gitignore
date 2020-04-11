@@ -1,0 +1,11 @@
+.vscode/*
+thoughtinator/.vscode/*
+thoughtinator/.mypy_cache/*
+.mypy_cache/*
+thoughtinator/.mypy_cache/3.8
+thoughtinator/thoughtinator/gui/react/thoughtinator-gui/node_modules/*
+.env/*
+thoughtinator/.env/*
+thoughtinator/.pytest_cache/*
+.pytest_cache/*
+.coverage

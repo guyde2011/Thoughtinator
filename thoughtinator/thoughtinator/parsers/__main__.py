@@ -44,7 +44,7 @@ def command_parse(field, filename):
         logger.error(f'Parser {ansi.bold(field)} does not exist')
         return
 
-    with open(filename, 'r') as f:
+    with open(filename, 'rb') as f:
         data = f.read()
 
     print(parser[field](data))

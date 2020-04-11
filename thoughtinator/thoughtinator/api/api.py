@@ -9,9 +9,16 @@ import thoughtinator.database.drivers as db_drivers
 from thoughtinator.database import Database
 
 
-class API(FlaskEndpoint):
+class APIEndpoint(FlaskEndpoint):
 
     def __init__(self, db_url: str, *, fields: List[str] = []):
+        """ Creates a new API endpoint instance, which can be ran using .run
+        :type db_url: str
+        :param db_url: the database's url
+
+        :type fields: List[str]
+        :param fields: The list of supported snapshot fields
+        """
         super().__init__('thoughtinator3000/api')
         self.database = Database(db_drivers[furl(db_url).scheme](db_url))
         self._fields = [f.replace('-', '_') for f in fields]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

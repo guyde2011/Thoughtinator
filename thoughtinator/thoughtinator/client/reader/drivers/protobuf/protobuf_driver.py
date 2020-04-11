@@ -5,8 +5,10 @@ from google.protobuf.json_format import MessageToDict
 
 from .thoughtinator_pb2 import Snapshot, User
 
+from thoughtinator.client.reader import ReaderDriver
 
-class ProtobufDriver:
+
+class ProtobufDriver(ReaderDriver):
     def __init__(self, path: str):
         self._path = path
         self._user = User()  # type: ignore

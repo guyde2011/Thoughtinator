@@ -2,15 +2,28 @@ from functools import cached_property
 
 from typing import Optional, Iterable, overload, List, Union, cast
 
-from . import DatabaseDriver, User, Snapshot
+from thoughtinator.protocol import DatabaseDriver, User, Snapshot
 
 
 class Database:
+    """
+    A wrapper for the access to the database via drivers
+    For more info see Database.users and Database.snapshots
+    """
     def __init__(self, driver: DatabaseDriver):
+        """ Creates a new database driver wrapper
+        :type driver: DatabaseDriver
+        :param driver: the driver to wrap
+        """
         self._driver: DatabaseDriver = driver
 
     @cached_property
     def users(self):
+        """
+        The users in the database
+        Use iter(database.users) to get all users.
+        Use database.users[user_id] to get a specific user
+        """
         class UsersProxy:
             def __iadd__(_, user: User):
                 self._driver.put_user(user)
@@ -28,7 +41,11 @@ class Database:
     @cached_property
     def snapshots(self):
         class SnapshotsProxy:
-
+            """
+            The snapshots in the database
+            Use database.snapshots[user] to get all snapshots of a user
+            Use database.snapshots[snapshot_id] to get a specific snapshot
+            """
             @overload
             def __getitem__(_, snap_id: int) -> Optional[Snapshot]: ...  # noqa: F811, E501
 
