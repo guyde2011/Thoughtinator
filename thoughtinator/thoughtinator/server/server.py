@@ -14,6 +14,13 @@ class ServerEndpoint(FlaskEndpoint):
                  publish: Callable,
                  *,
                  path: Optional[Path] = None):
+        """ Creates a new upload server endpoint
+        :type publish: Callable
+        :param publish: the publish method to publish incoming snapshots to
+
+        :type path: Path or None
+        :param path: the path to the save folder (defaults to $SAVE_FOLDER)
+        """
         super().__init__('thoughtinator/server')
         self.publish = publish
         self.path: Path = path or Path(env.os['SAVE_FOLDER'])

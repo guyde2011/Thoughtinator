@@ -1,7 +1,7 @@
 import click
 import sys
 
-from . import API
+from . import APIEndpoint
 
 
 @click.group()
@@ -14,10 +14,10 @@ def cli():
 @click.option('--port', '-p', required=True, type=int)
 @click.option('--database', '-d', required=True, type=str)
 def command_run_server(host: str, port: int, database: str):
-    api = API(database, fields=['pose',
-                                'color-image',
-                                'depth-image',
-                                'feelings'])
+    api = APIEndpoint(database, fields=['pose',
+                                        'color-image',
+                                        'depth-image',
+                                        'feelings'])
     api.run(host, port)
 
 
