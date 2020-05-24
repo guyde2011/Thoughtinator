@@ -1,0 +1,8 @@
+.git
+.env
+.pytest_cache
+tests
+.travis.yml
+docs
+thoughtinator/gui/react/thoughtinator-gui/build
+thoughtinator/gui/react/thoughtinator-gui/node_modules

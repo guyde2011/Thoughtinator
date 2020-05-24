@@ -6,7 +6,7 @@ from typing import List, Optional
 from pymongo import MongoClient
 
 from thoughtinator.database import DatabaseDriver, User, Snapshot, Database
-from thoughtinator.api import API
+from thoughtinator.api import APIEndpoint
 
 from multiprocessing import Process
 
@@ -75,8 +75,7 @@ def proc_runner(monkeypatch):
         def run():
             monkeypatch.setattr(sys, 'exit', lambda *args, **kwargs: None)
             cmd(total)
-        return ProcCM(Process(target=run), delay)
-        
+        return ProcCM(Process(target=run), delay)     
 
     return run_cli
 
@@ -91,7 +90,7 @@ def db_driver():
 
 @pytest.fixture
 def api_requests(db_driver):
-    api = API('mock://127.0.0.1:1245',
+    api = APIEndpoint('mock://127.0.0.1:1245',
               fields=['pose', 'feelings', 'color_image', 'depth_image'])
     api.database = Database(db_driver)
     return api.test_client(), db_driver

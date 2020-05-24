@@ -6,7 +6,7 @@ import MainPage from './components/main_page'
 import './App.css';
 import UsersPage from './components/users_page';
 
-var api = new API('127.0.0.1', 1200);
+var api = new API(window.api_host, window.api_port);
 
 
 

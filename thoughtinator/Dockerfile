@@ -21,10 +21,14 @@ EXPOSE 8080 5000 8000
 ADD scripts/wait-for-it.sh /wait-for-it.sh
 RUN chmod 755 wait-for-it.sh
 
+ADD thoughtinator /thoughtinator
+
 # Build GUI
 WORKDIR /thoughtinator/gui/react/thoughtinator-gui
 RUN npm install
 RUN npm install react react-dom react-datepicker bootstrap
 RUN npm run build
+
+ADD config.json /config.json
 
 WORKDIR /

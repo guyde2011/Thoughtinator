@@ -2,7 +2,7 @@ from functools import cached_property
 
 from typing import Optional, Iterable, overload, List, Union, cast
 
-from thoughtinator.protocol import DatabaseDriver, User, Snapshot
+from . import DatabaseDriver, User, Snapshot
 
 
 class Database:

@@ -8,7 +8,7 @@ services:
             - 5672:5672
 # MongoDB service
     mongodb:
-        image: mongodb
+        image: mongo
         ports:
             - 27017:27017
 # Upload Server service
@@ -16,7 +16,7 @@ services:
         image: thoughtinator
         build: .
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         depends_on:
             - rabbitmq
         ports:
@@ -24,22 +24,31 @@ services:
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
             PYTHONUNBUFFERED: 1
-        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.server run-server 'rabbitmq://rabbitmq:5672'
+        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.server run-server  -h '0.0.0.0' -p 8000 'rabbitmq://rabbitmq:5672'
     pose_parser:
         image: thoughtinator
-            - main_volume: /thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
             - server
             - rabbitmq
         command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.parsers run-parser 'pose' 'rabbitmq://rabbitmq:5672'
+    feelings_parser:
+        image: thoughtinator
+        volumes:
+            - shared_data:/thoughtinator
+        environment:
+            SAVE_FOLDER: "/thoughtinator/save"
+        depends_on:
+            - server
+            - rabbitmq
+        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.parsers run-parser 'feelings' 'rabbitmq://rabbitmq:5672'
     color_image_parser:
         image: thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
@@ -49,38 +58,28 @@ services:
     depth_image_parser:
         image: thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
             - server
             - rabbitmq
         command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.parsers run-parser 'depth_image' 'rabbitmq://rabbitmq:5672'
-    feelings_parser:
-        image: thoughtinator
-        volumes:
-            - main_volume: /thoughtinator
-        environment:
-            SAVE_FOLDER: "/thoughtinator/save"
-        depends_on:
-            - server
-            - rabbitmq
-        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.parsers run-parser 'feelings' 'rabbitmq://rabbitmq:5672'
     saver:
         image: thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
             - server
             - rabbitmq
             - mongodb
-        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.saver run-saver 'postgresql://colin:password@postgres:5432/colin' 'rabbitmq://rabbitmq:5672/'
+        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.saver run-saver 'mongodb://mongodb:27017' 'rabbitmq://rabbitmq:5672/'
     api:
         image: thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
@@ -88,11 +87,11 @@ services:
             - mongodb
         ports:
             - 5000:5000
-        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.api run-server -d 'postgresql://colin:password@postgres:5432/colin'
+        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.api run-server -d 'mongodb://mongodb:27017' -h '0.0.0.0' -p 5000
     gui:
         image: thoughtinator
         volumes:
-            - main_volume: /thoughtinator
+            - shared_data:/thoughtinator
         environment:
             SAVE_FOLDER: "/thoughtinator/save"
         depends_on:
@@ -100,4 +99,7 @@ services:
             - mongodb
         ports:
         - 8080:8080
-        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.gui run-server
+        command: ./wait-for-it.sh rabbitmq:5672 -- python3.8 -m thoughtinator.gui run-server -h '0.0.0.0' -p 8080 -H '127.0.0.1' -P 5000
+
+volumes:
+    shared_data:
