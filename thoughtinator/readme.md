@@ -27,7 +27,7 @@ Made as part of the TAU course Advanced System Design
    
 	And enter into it:
 	  ```bash
-	   cd thoughtinator
+	   cd thoughtinator/thoughtinator
     ```
 
 2. Setup the work environment via running
