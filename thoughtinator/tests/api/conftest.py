@@ -1,3 +1,3 @@
 import pytest
 
-from thoughtinator.api import API
+from thoughtinator.api import APIEndpoint
