@@ -20,4 +20,4 @@ def test_upload(patcher, snap_file):
     upload_sample(path=snap_file, host='HOST', port=3456, file_format='protobuf')
     assert buffer[0][0] == UPLOAD_USER
     assert buffer[1][0] == UPLOAD_SNAPSHOT
-    
+
